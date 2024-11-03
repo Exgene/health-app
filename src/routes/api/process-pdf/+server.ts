@@ -1,10 +1,24 @@
 import { GEMINI_API_KEY } from '$env/static/private';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { json } from '@sveltejs/kit';
-import { PDFExtract } from 'pdf.js-extract';
+import { PDFExtract, type PDFExtractOptions } from 'pdf.js-extract';
 
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+
+// Configure PDF extract options
+const options: PDFExtractOptions = {
+	firstPage: 1,
+	lastPage: undefined,
+	password: '',
+	verbosity: -1,
+	normalizeWhitespace: true,
+	disableCombineTextItems: false,
+	// Set custom path for pdf.worker.js
+	pdfJS: {
+		workerSrc: '/node_modules/pdf.js-extract/lib/pdfjs/pdf.worker.js'
+	}
+};
 
 export async function POST({ request }) {
 	try {
@@ -15,18 +29,19 @@ export async function POST({ request }) {
 			throw new Error('No PDF file provided');
 		}
 
+		// Initialize with options
 		const pdfExtract = new PDFExtract();
 		const arrayBuffer = await pdfFile.arrayBuffer();
-		const data = await pdfExtract.extractBuffer(arrayBuffer);
-		
+		const data = await pdfExtract.extractBuffer(arrayBuffer, options);
+
+		// Combine all page content
 		const fullText = data.pages
-			.map(page => page.content.map(item => item.str).join(' '))
+			.map((page) => page.content.map((item) => item.str).join(' '))
 			.join('\n');
 
 		// Get Gemini response and store both
 		const geminiResponse = await getGeminiResponse(fullText);
 		await storeTextContent(fullText, geminiResponse);
-
 
 		return json({ success: true });
 	} catch (error) {
