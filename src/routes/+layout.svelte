@@ -18,9 +18,7 @@
 		<a class="text-sm font-medium transition-colors hover:text-blue-600" href="#how-it-works">
 			How It Works
 		</a>
-		<a class="text-sm font-medium transition-colors hover:text-blue-600" href="#pricing">
-			Pricing
-		</a>
+
 	</nav>
 </header>
 {@render children()}

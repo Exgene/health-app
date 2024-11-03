@@ -1,10 +1,24 @@
 import { GEMINI_API_KEY } from '$env/static/private';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { json } from '@sveltejs/kit';
-import { PdfReader } from 'pdfreader';
+import { PDFExtract, type PDFExtractOptions } from 'pdf.js-extract';
 
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+
+// Configure PDF extract options
+const options: PDFExtractOptions = {
+	firstPage: 1,
+	lastPage: undefined,
+	password: '',
+	verbosity: -1,
+	normalizeWhitespace: true,
+	disableCombineTextItems: false,
+	// Set custom path for pdf.worker.js
+	pdfJS: {
+		workerSrc: '/node_modules/pdf.js-extract/lib/pdfjs/pdf.worker.js'
+	}
+};
 
 export async function POST({ request }) {
 	try {
@@ -15,8 +29,15 @@ export async function POST({ request }) {
 			throw new Error('No PDF file provided');
 		}
 
-		const buffer = await pdfFile.arrayBuffer();
-		const fullText = await extractText(Buffer.from(buffer));
+		// Initialize with options
+		const pdfExtract = new PDFExtract();
+		const arrayBuffer = await pdfFile.arrayBuffer();
+		const data = await pdfExtract.extractBuffer(arrayBuffer, options);
+
+		// Combine all page content
+		const fullText = data.pages
+			.map((page) => page.content.map((item) => item.str).join(' '))
+			.join('\n');
 
 		// Get Gemini response and store both
 		const geminiResponse = await getGeminiResponse(fullText);
@@ -29,45 +50,28 @@ export async function POST({ request }) {
 	}
 }
 
-function extractText(buffer: Buffer): Promise<string> {
-	return new Promise((resolve, reject) => {
-		const reader = new PdfReader();
-		let textContent = '';
-
-		reader.parseBuffer(buffer, (err, item) => {
-			if (err) {
-				reject(err);
-			} else if (!item) {
-				resolve(textContent);
-			} else if (item.text) {
-				textContent += item.text + ' ';
-			}
-		});
-	});
-}
-
 async function getGeminiResponse(text: string) {
 	const prompt = `You are an AI health assistant analyzing medical reports. Please analyze the following medical report and provide insights in JSON format.
 
 Expected format:
 {
-	"ai-insights": "Key medical findings, diagnoses, and important observations from the report",
-	"food-to-eat": "List of recommended foods based on the medical condition",
-	"food-not-to-eat": "List of foods to avoid based on the medical condition"
+	"aiInsights": "Key medical findings, diagnoses, and important observations from the report",
+	"foodToEat": "List of recommended foods based on the medical condition",
+	"foodNotToEat": "List of foods to avoid based on the medical condition"
 }
 
 Example response:
 {
-	"ai-insights": "Patient shows elevated blood pressure (140/90) and high cholesterol levels (240 mg/dL). Early signs of type 2 diabetes with HbA1c of 6.3%.",
-	"food-to-eat": "Leafy greens, whole grains, lean proteins, berries, fatty fish, nuts, seeds, legumes",
-	"food-not-to-eat": "Processed foods, saturated fats, sugary drinks, high-sodium foods, refined carbohydrates"
+	"aiInsights": "Patient shows elevated blood pressure (140/90) and high cholesterol levels (240 mg/dL). Early signs of type 2 diabetes with HbA1c of 6.3%.",
+	"foodToEat": "Leafy greens, whole grains, lean proteins, berries, fatty fish, nuts, seeds, legumes",
+	"foodNotToEat": "Processed foods, saturated fats, sugary drinks, high-sodium foods, refined carbohydrates"
 }
 
 If no relevant medical insights or dietary recommendations can be found, return:
 {
-	"ai-insights": "",
-	"food-to-eat": "",
-	"food-not-to-eat": ""
+	"aiInsights": "",
+	"foodToEat": "",
+	"foodNotToEat": ""
 }
 
 Please analyze this medical report:

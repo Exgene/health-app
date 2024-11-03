@@ -20,9 +20,9 @@ importers:
       lucide-svelte:
         specifier: ^0.454.0
         version: 0.454.0(svelte@5.1.9)
-      pdfreader:
-        specifier: ^3.0.5
-        version: 3.0.5
+      pdf.js-extract:
+        specifier: ^0.2.1
+        version: 0.2.1
       postgres:
         specifier: ^3.4.4
         version: 3.4.5
@@ -919,6 +919,9 @@ packages:
   dlv@1.1.3:
     resolution: {integrity: sha512-+HlytyjlPKnIG8XuRG8WvmBP8xs8P71y+SKKS6ZXWoEgLuePxtDoUEiH7WkdePWrQ5JBpE6aoVqfZfJUQkjXwA==}
 
+  dommatrix@0.0.24:
+    resolution: {integrity: sha512-PatEhAW5pIHr28MvFQGV5iiHNloqvecQZlxs7/8s/eulLqZI3uVqPkrO7YDuqsebovr/9mmcWDSWzVG4amEZgQ==}
+
   drizzle-kit@0.22.8:
     resolution: {integrity: sha512-VjI4wsJjk3hSqHSa3TwBf+uvH6M6pRHyxyoVbt935GUzP9tUR/BRZ+MhEJNgryqbzN2Za1KP0eJMTgKEPsalYQ==}
     hasBin: true
@@ -1360,16 +1363,9 @@ packages:
     resolution: {integrity: sha512-Xa4Nw17FS9ApQFJ9umLiJS4orGjm7ZzwUrwamcGQuHSzDyth9boKDaycYdDcZDuqYATXw4HFXgaqWTctW/v1HA==}
     engines: {node: '>=16 || 14 >=14.18'}
 
-  pdf2json@3.1.4:
-    resolution: {integrity: sha512-rS+VapXpXZr+5lUpHmRh3ugXdFXp24p1RyG24yP1DMpqP4t0mrYNGpLtpSbWD42PnQ59GIXofxF+yWb7M+3THg==}
-    engines: {node: '>=18.12.1', npm: '>=8.19.2'}
-    hasBin: true
-    bundledDependencies:
-      - '@xmldom/xmldom'
-
-  pdfreader@3.0.5:
-    resolution: {integrity: sha512-1xuKu/WakHbmobORf+xJd+n77A5JhHgojvDBYq/wkhxrAy2nr0/049AEeZFpQ/mUUPVu+6gHgKmgWg74RpDYuQ==}
-    engines: {node: '>=14'}
+  pdf.js-extract@0.2.1:
+    resolution: {integrity: sha512-oUs5KaTVCelIyiBajCx3zAZKurkN9oVwRdqbSeDqeofddxNuwJRur86fCETvKZ/tX5nZJUSZWq3ie76PsArz7A==}
+    engines: {node: '>=12.0.0'}
 
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
@@ -1751,6 +1747,10 @@ packages:
     peerDependenciesMeta:
       vite:
         optional: true
+
+  web-streams-polyfill@3.2.0:
+    resolution: {integrity: sha512-EqPmREeOzttaLRm5HS7io98goBgZ7IVz79aDvqjD0kYXLtFZTc0T/U6wHTPKyIjb+MdN7DFIIX6hgdBEpWmfPA==}
+    engines: {node: '>= 8'}
 
   webidl-conversions@3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
@@ -2383,6 +2383,8 @@ snapshots:
 
   dlv@1.1.3: {}
 
+  dommatrix@0.0.24: {}
+
   drizzle-kit@0.22.8:
     dependencies:
       '@esbuild-kit/esm-loader': 2.6.5
@@ -2766,11 +2768,10 @@ snapshots:
       lru-cache: 10.4.3
       minipass: 7.1.2
 
-  pdf2json@3.1.4: {}
-
-  pdfreader@3.0.5:
+  pdf.js-extract@0.2.1:
     dependencies:
-      pdf2json: 3.1.4
+      dommatrix: 0.0.24
+      web-streams-polyfill: 3.2.0
 
   picocolors@1.1.1: {}
 
@@ -3106,6 +3107,8 @@ snapshots:
   vitefu@1.0.3(vite@5.4.10):
     optionalDependencies:
       vite: 5.4.10
+
+  web-streams-polyfill@3.2.0: {}
 
   webidl-conversions@3.0.1: {}
 
