@@ -1,7 +1,7 @@
 import { GEMINI_API_KEY } from '$env/static/private';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { json } from '@sveltejs/kit';
-import * as pdfjsLib from 'pdfjs-dist';
+import { PDFExtract } from 'pdf.js-extract';
 
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
@@ -15,17 +15,13 @@ export async function POST({ request }) {
 			throw new Error('No PDF file provided');
 		}
 
+		const pdfExtract = new PDFExtract();
 		const arrayBuffer = await pdfFile.arrayBuffer();
-		const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-
-		let fullText = '';
-
-		for (let i = 1; i <= pdf.numPages; i++) {
-			const page = await pdf.getPage(i);
-			const textContent = await page.getTextContent();
-			const pageText = textContent.items.map((item) => ('str' in item ? item.str : '')).join(' ');
-			fullText += pageText + '\n';
-		}
+		const data = await pdfExtract.extractBuffer(arrayBuffer);
+		
+		const fullText = data.pages
+			.map(page => page.content.map(item => item.str).join(' '))
+			.join('\n');
 
 		// Get Gemini response and store both
 		const geminiResponse = await getGeminiResponse(fullText);
