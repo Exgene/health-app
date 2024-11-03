@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { fileStore } from '$lib/stores/files.svelte';
+	import { createFileStore } from '$lib/stores/files.svelte';
 	import type { PageData } from '../$types';
 
-	export let data;
+	const { data } = $props();
 
 	const { pdfContent, geminiResponse } = data;
 
-	$: file = $fileStore;
-	console.log(file)
+	const fileStore = createFileStore();
+	console.log(fileStore.file);
 </script>
 
 <div class="mx-auto max-w-7xl p-8">
@@ -27,7 +27,7 @@
 		</div>
 	{/if}
 
-	{#if file}
-		{file.name}
+	{#if fileStore.file}
+		{fileStore.file.name}
 	{/if}
 </div>
