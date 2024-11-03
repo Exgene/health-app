@@ -1,6 +1,6 @@
 <script>
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { createFileStore } from '$lib/stores/files.svelte';
+	import { fileStore } from '$lib/stores/files.svelte';
 	import {
 		ChartNoAxesColumnIncreasingIcon,
 		ChevronRight,
@@ -11,7 +11,6 @@
 
 	let selectedFile = $state(null);
 	let uploadStatus = $state('unselected');
-	const fileStore = createFileStore();
 
 	const testimonials = [
 		{
@@ -56,6 +55,7 @@
 			formData.append('pdf', selectedFile);
 
 			await new Promise((resolve) => setTimeout(resolve, 2000));
+			fileStore.file = selectedFile;
 
 			const response = await fetch('/api/process-pdf', {
 				method: 'POST',

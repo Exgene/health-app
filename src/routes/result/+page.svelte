@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { createFileStore } from '$lib/stores/files.svelte';
+	import { fileStore } from '$lib/stores/files.svelte';
 	import type { PageData } from '../$types';
 
 	const { data } = $props();
 
 	const { pdfContent, geminiResponse } = data;
 
-	const fileStore = createFileStore();
 	console.log(fileStore.file);
+
 </script>
 
 <div class="mx-auto max-w-7xl p-8">
