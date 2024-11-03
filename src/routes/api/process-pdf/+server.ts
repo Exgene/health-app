@@ -1,24 +1,10 @@
 import { GEMINI_API_KEY } from '$env/static/private';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { json } from '@sveltejs/kit';
-import { PDFExtract, type PDFExtractOptions } from 'pdf.js-extract';
+import { PdfReader } from 'pdfreader';
 
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-
-// Configure PDF extract options
-const options: PDFExtractOptions = {
-	firstPage: 1,
-	lastPage: undefined,
-	password: '',
-	verbosity: -1,
-	normalizeWhitespace: true,
-	disableCombineTextItems: false,
-	// Set custom path for pdf.worker.js
-	pdfJS: {
-		workerSrc: '/node_modules/pdf.js-extract/lib/pdfjs/pdf.worker.js'
-	}
-};
 
 export async function POST({ request }) {
 	try {
@@ -29,15 +15,8 @@ export async function POST({ request }) {
 			throw new Error('No PDF file provided');
 		}
 
-		// Initialize with options
-		const pdfExtract = new PDFExtract();
-		const arrayBuffer = await pdfFile.arrayBuffer();
-		const data = await pdfExtract.extractBuffer(arrayBuffer, options);
-
-		// Combine all page content
-		const fullText = data.pages
-			.map((page) => page.content.map((item) => item.str).join(' '))
-			.join('\n');
+		const buffer = await pdfFile.arrayBuffer();
+		const fullText = await extractText(Buffer.from(buffer));
 
 		// Get Gemini response and store both
 		const geminiResponse = await getGeminiResponse(fullText);
@@ -48,6 +27,23 @@ export async function POST({ request }) {
 		console.error('Error processing PDF:', error);
 		return json({ success: false, error: 'Failed to process PDF' }, { status: 500 });
 	}
+}
+
+function extractText(buffer: Buffer): Promise<string> {
+	return new Promise((resolve, reject) => {
+		const reader = new PdfReader();
+		let textContent = '';
+
+		reader.parseBuffer(buffer, (err, item) => {
+			if (err) {
+				reject(err);
+			} else if (!item) {
+				resolve(textContent);
+			} else if (item.text) {
+				textContent += item.text + ' ';
+			}
+		});
+	});
 }
 
 async function getGeminiResponse(text: string) {
