@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { fileStore } from '$lib/stores/files.svelte';
 	import {
@@ -9,8 +9,8 @@
 		Utensils
 	} from 'lucide-svelte';
 
-	let selectedFile = $state(null);
-	let uploadStatus = $state('unselected');
+	let selectedFile = $state<File | null>(null);
+	let uploadStatus = $state<'unselected' | 'loading' | 'successful' | 'failed'>('unselected');
 
 	const testimonials = [
 		{
@@ -32,8 +32,8 @@
 		}
 	];
 
-	function handleFileSelect(event) {
-		const file = event.target.files[0];
+	function handleFileSelect(event: Event) {
+		const file = (event.target as HTMLInputElement).files?.[0];
 		if (file && file.type === 'application/pdf') {
 			selectedFile = file;
 			console.log(selectedFile);
@@ -42,7 +42,7 @@
 		}
 	}
 
-	async function handleSubmit(event) {
+	async function handleSubmit(event: Event) {
 		event.preventDefault();
 		if (!selectedFile) {
 			return;
@@ -56,6 +56,7 @@
 
 			await new Promise((resolve) => setTimeout(resolve, 2000));
 			fileStore.file = selectedFile;
+			console.log(fileStore.file);
 
 			const response = await fetch('/api/process-pdf', {
 				method: 'POST',

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { fileStore } from '$lib/stores/files.svelte';
 	import type { PageData } from '../$types';
 
@@ -6,8 +7,9 @@
 
 	const { pdfContent, geminiResponse } = data;
 
-	console.log(fileStore.file);
-
+	if (browser) {
+		console.log(fileStore.file);
+	}
 </script>
 
 <div class="mx-auto max-w-7xl p-8">
