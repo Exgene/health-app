@@ -36,7 +36,6 @@
 		const file = (event.target as HTMLInputElement).files?.[0];
 		if (file && file.type === 'application/pdf') {
 			selectedFile = file;
-			console.log(selectedFile);
 		} else {
 			selectedFile = null;
 		}

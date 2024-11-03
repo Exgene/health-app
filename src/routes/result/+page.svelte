@@ -1,15 +1,10 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import { fileStore } from '$lib/stores/files.svelte';
 	import type { PageData } from '../$types';
 
 	const { data } = $props();
 
 	const { pdfContent, geminiResponse } = data;
-
-	if (browser) {
-		console.log(fileStore.file);
-	}
 </script>
 
 <div class="mx-auto max-w-7xl p-8">
@@ -29,7 +24,5 @@
 		</div>
 	{/if}
 
-	{#if fileStore.file}
-		{fileStore.file.name}
-	{/if}
+	{JSON.stringify(fileStore)}
 </div>
