@@ -82,7 +82,7 @@
 	class="flex min-h-screen flex-col bg-gradient-to-b from-blue-50 to-white dark:from-blue-900 dark:to-gray-900"
 >
 	<main class="flex-1">
-		<!-- <div id="chatbot-container" class="fixed bottom-0 right-0 z-50 h-72 w-96">
+		<div id="chatbot-container" class="fixed bottom-0 right-0 z-50 h-72 w-96">
 			<iframe
 				title="chatbot"
 				src="https://cdn.botpress.cloud/webchat/v2.2/shareable.html?configUrl=https://files.bpcontent.cloud/2024/10/27/15/20241027151708-K7MZ8AH0.json"
@@ -90,7 +90,7 @@
 				style="width: 100%; height: 100%; border: none; border-radius: 10px;"
 			>
 			</iframe>
-		</div> -->
+		</div>
 		<section class="relative w-full overflow-hidden py-12 md:py-24 lg:py-32 xl:py-48">
 			<div class="container relative z-10 px-4 md:px-6">
 				<div class="flex flex-col items-center space-y-4 text-center">
