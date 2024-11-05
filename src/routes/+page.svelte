@@ -11,6 +11,7 @@
 
 	let selectedFile = $state<File | null>(null);
 	let uploadStatus = $state<'unselected' | 'loading' | 'successful' | 'failed'>('unselected');
+	let resultId = $state(null);
 
 	const testimonials = [
 		{
@@ -65,6 +66,9 @@
 			if (!response.ok) {
 				throw new Error('Failed to process PDF');
 			}
+
+			const data = await response.json();
+			resultId = data.id;
 
 			uploadStatus = 'successful';
 		} catch (error) {
@@ -263,7 +267,7 @@
 								disabled={!selectedFile || uploadStatus === 'loading'}
 								onclick={() => {
 									if (uploadStatus === 'successful') {
-										window.location.href = '/result';
+										window.location.href = `/result/${resultId}`;
 										uploadStatus = 'unselected';
 										selectedFile = null;
 									}
